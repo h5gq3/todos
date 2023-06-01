@@ -1,0 +1,10 @@
+:~  title+'todos'
+    info+'todo app that uses hoon ui library'
+    color+0x81.88c9
+    image+'https://media.urbit.org/guides/additional/dist/wut.svg'
+    base+'todos'
+    site+/todos
+    version+[0 0 1]
+    website+'https://developers.urbit.org/guides/additional/software-distribution'
+    license+'MIT'
+==
