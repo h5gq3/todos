@@ -433,8 +433,8 @@
       %+  turn  `(list manx)`flat-manx
       |=  =manx
       :: ~&  manx
-      ^-  [term term (unit vase)]
-      :+  ^-  term
+      ^-  [term term (unit vase) marl]
+      :^  ^-  term
           %-  crip
           (need (~(get-attr manx-tools *^manx) g.manx %sail-id))
           ::
@@ -444,12 +444,14 @@
             (~(get-attr manx-tools *^manx) g.manx %props)
           ?~  props  ~
           `!>((cue (slav %ud (crip u.props))))
+          ::
+          c.manx
     =/  new-component-cards
       %+  turn  components-list
-        |=  [dit=term cab=term pop=(unit vase)]
+        |=  [dit=term cab=term pop=(unit vase) sot=marl]
         ^-  card:agent:gall
         :: [%pass /start-agent %arvo %g [%jole q.byk.bowl dap !>(agent)]]
-        [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop]])]]
+        [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop sot]])]]
     =.  cards  :(weld new-component-cards og-cards cards)
     :: [cards this(current-manx (component-div-tag (with-id view:og)))]
     [cards this]
@@ -522,7 +524,7 @@
           %new-component
             =/  c  (~(got by components) cab.poke)
             =/  bowl  (make-bowl bowl [dit.poke cab.poke])
-            =/  [cards=(list card:agent:gall) this=agent:gall]  on-init(component c(bowl bowl, props pop.poke))  ::TODO|DONE what do with dit.poke?
+            =/  [cards=(list card:agent:gall) this=agent:gall]  on-init(component c(bowl bowl, props pop.poke, children sot.poke))  ::TODO|DONE what do with dit.poke?
             :: =^  cards  this  on-init(component ~(. c [pop.poke *marl bowl]))  ::TODO|DONE what do with dit.poke?
             ::TODO watch card paths we need to put to wrapper state
             [cards this]
@@ -649,8 +651,8 @@
         |=  =manx
         :: ~&  "unique manx"
         :: ~&  manx
-        ^-  [term term (unit vase)]
-        :+  ^-  term
+        ^-  [term term (unit vase) marl]
+        :^  ^-  term
             %-  crip
             (need (~(get-attr manx-tools *^manx) g.manx %sail-id))
             ::
@@ -660,6 +662,8 @@
               (~(get-attr manx-tools *^manx) g.manx %props)
             ?~  props  ~
             `!>((cue (slav %ud (crip u.props))))
+            ::
+            c.manx
       =/  to-be-removed-components-list
         %+  turn  unique-current
         |=  =manx
@@ -668,9 +672,9 @@
           (need (~(get-attr manx-tools *^manx) g.manx %sail-id))
     =/  new-component-cards
       %+  turn  new-components-list
-        |=  [dit=term cab=term pop=(unit vase)]
+        |=  [dit=term cab=term pop=(unit vase) sot=marl]
         ^-  card:agent:gall
-        [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop]])]]
+        [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop sot]])]]
     =/  remove-component-cards
       %+  turn  to-be-removed-components-list
         |=  dit=term
