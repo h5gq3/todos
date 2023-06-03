@@ -12,7 +12,7 @@
   ==
 +$  ui-poke
   $%  [%domevent dom-event]
-      [%new-component [dit=term cab=term pop=(unit vase)]]
+      [%new-component [dit=term cab=term pop=(unit vase) sot=marl]]
       [%remove-component dit=term]
       [%forward-subscription [dit=term [=wire =sign:agent:gall]]]
   ==
