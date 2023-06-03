@@ -1,5 +1,5 @@
 /-  sur=todos, ui
-/+  ui2, ui3, ui4, agentio, default-agent
+/+  ui4, agentio, default-agent
 
 ^-  web-component:ui4
 |_  [props=(unit vase) children=marl =bowl:ui4]

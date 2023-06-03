@@ -1,7 +1,5 @@
-::  div component
-::
 /-  sur=todos, ui
-/+  ui2, ui3, ui4, agentio, default-agent, manx-tools
+/+  ui4, agentio, default-agent, manx-tools
 ::
 |%
 +$  props
@@ -49,7 +47,7 @@
       [%event-listeners ~]
     :_  this
     :~
-    [%give %fact ~ [%json !>((all-domevents-json:ui3 ~[[dit.bowl ~[%click %mouseenter %mouseleave]]]))]]
+    [%give %fact ~ [%json !>((all-domevents-json:ui4 ~[[dit.bowl ~[%click %mouseenter %mouseleave]]]))]]
     ==
   ==
 ++  on-leave  on-leave:default

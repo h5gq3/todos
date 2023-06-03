@@ -26,6 +26,25 @@
   ^-  ^bowl
   [dit cab bowl]
 ::
+++  all-domevents-json
+  |=  events=(list [@t (list term)])
+  ^-  json
+  :-  %a
+  %+  turn  events
+  |=  [e=[@t (list term)]]
+  %+  frond:enjs:format
+  -.e
+  :-  %a
+  %+  turn  +.e
+  |=  [t=term]
+  ^-  json
+  s+t
+::
+++  s
+  |=  a=*
+  ^-  tape
+  <(jam a)>
+::
 ++  apply-elem
   |=  [a=manx parent=@ self=@ b=$-([marx [@ @]] marx)]
   |^  ^-  manx

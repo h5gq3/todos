@@ -1,6 +1,5 @@
-:: todo input sail-component
 /-  ui
-/+  ui2, ui3, ui4, agentio, default-agent
+/+  ui4, agentio, default-agent
 
 |%
 +$  state
@@ -39,7 +38,7 @@
       [%event-listeners ~]
     :_  this
     :~
-    [%give %fact ~ [%json !>((all-domevents-json:ui3 ~[[dit.bowl ~[%keydown]]]))]]
+    [%give %fact ~ [%json !>((all-domevents-json:ui4 ~[[dit.bowl ~[%keydown]]]))]]
     ==
   ==
 ++  on-leave  on-leave:default
