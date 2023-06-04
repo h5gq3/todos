@@ -7,12 +7,12 @@
   $:  cab=term
       sta=vase
       viw=manx
-      pop=(unit vase)
+      pop=(map mane vase)
       sot=marl
   ==
 +$  ui-poke
   $%  [%domevent dom-event]
-      [%new-component [dit=term cab=term pop=(unit vase) sot=marl]]
+      [%new-component [dit=term cab=term pop=(map mane vase) sot=marl]]
       [%remove-component dit=term]
       [%forward-subscription [dit=term [=wire =sign:agent:gall]]]
   ==

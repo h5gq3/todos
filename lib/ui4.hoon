@@ -1,4 +1,4 @@
-/-  html-tag, *ui
+/-  html-tag, html-attr, *ui
 /+  default-agent, server, agentio, manx-tools, ui2
 
 =|  wrapper-state
@@ -16,7 +16,7 @@
   ==
 ::
 +$  component-sample
-  $:  props=(unit vase)
+  $:  props=(map mane vase)
       children=marl
       =bowl
   ==
@@ -87,7 +87,7 @@
 ::
 ++  web-component
   $_  ^|
-  |_  [props=(unit vase) children=marl =bowl]
+  |_  [props=(map mane vase) children=marl =bowl]
   ++  view  *manx
   ::
   ++  on-init
@@ -433,22 +433,30 @@
       %+  turn  `(list manx)`flat-manx
       |=  =manx
       :: ~&  manx
-      ^-  [term term (unit vase) marl]
+      ^-  [term term (map mane vase) marl]
       :^  ^-  term
           %-  crip
           (need (~(get-attr manx-tools *^manx) g.manx %sail-id))
           ::
           ;;(term n.g.manx)
           ::
-          =/  props
-            (~(get-attr manx-tools *^manx) g.manx %props)
-          ?~  props  ~
-          `!>((cue (slav %ud (crip u.props))))
+          ^-  (map mane vase)
+          =.  a.g.manx
+            :: (~(del-attrs manx-tools manx) (silt ~[%sail-id %key]))
+            %+  skip  a.g.manx
+            |=  [attr=mane val=tape]
+            :: ?=(html-attr:html-attr attr)
+            |(?=(%sail-id attr) ?=(%key attr) ?=(html-attr:html-attr attr))
+          %-  ~(run by (malt a.g.manx))
+          |=  val=tape
+          =+  (slaw %ud (crip val))
+          ?~  -  !>(~)
+          !>((cue u.-))
           ::
           c.manx
     =/  new-component-cards
       %+  turn  components-list
-        |=  [dit=term cab=term pop=(unit vase) sot=marl]
+        |=  [dit=term cab=term pop=(map mane vase) sot=marl]
         ^-  card:agent:gall
         :: [%pass /start-agent %arvo %g [%jole q.byk.bowl dap !>(agent)]]
         [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop sot]])]]
@@ -456,7 +464,6 @@
     :: [cards this(current-manx (component-div-tag (with-id view:og)))]
     [cards this]
     :: [~ this]
-
   ::
   ++  on-save  !>([[%ui-wrapper wrapper-state] on-save:ag])
   ::
@@ -651,17 +658,25 @@
         |=  =manx
         :: ~&  "unique manx"
         :: ~&  manx
-        ^-  [term term (unit vase) marl]
+        ^-  [term term (map mane vase) marl]
         :^  ^-  term
             %-  crip
             (need (~(get-attr manx-tools *^manx) g.manx %sail-id))
             ::
             ;;(term n.g.manx)
             ::
-            =/  props
-              (~(get-attr manx-tools *^manx) g.manx %props)
-            ?~  props  ~
-            `!>((cue (slav %ud (crip u.props))))
+          ^-  (map mane vase)
+          =.  a.g.manx
+            :: (~(del-attrs manx-tools manx) (silt ~[%sail-id %key]))
+            %+  skip  a.g.manx
+            |=  [attr=mane val=tape]
+            |(?=(%sail-id attr) ?=(%key attr) ?=(html-attr:html-attr attr))
+            :: ?=(html-attr:html-attr attr)
+          %-  ~(run by (malt a.g.manx))
+          |=  val=tape
+          =+  (slaw %ud (crip val))
+          ?~  -  !>(~)
+          !>((cue u.-))
             ::
             c.manx
       =/  to-be-removed-components-list
@@ -672,7 +687,7 @@
           (need (~(get-attr manx-tools *^manx) g.manx %sail-id))
     =/  new-component-cards
       %+  turn  new-components-list
-        |=  [dit=term cab=term pop=(unit vase) sot=marl]
+        |=  [dit=term cab=term pop=(map mane vase) sot=marl]
         ^-  card:agent:gall
         [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop sot]])]]
     =/  remove-component-cards

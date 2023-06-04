@@ -18,7 +18,7 @@
 =*  state  -
 ::TODO need a custom bowl to include a map of agent names to paths to subscribe to
 :: this map would be used at on-init to produce subscription cards
-|_  [props=(unit vase) children=marl =bowl:ui4]
+|_  [props=(map mane vase) children=marl =bowl:ui4]
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
     io  ~(. agentio bowl.bowl)
@@ -26,8 +26,9 @@
 ++  on-init
   ^-  (quip card:agent:gall _this)
   =/  todo
-  ?~  props  *todo:sur
-    ;;(todo:sur !<(* u.props))
+    =+  (~(get by props) %todo)
+    ?~  -  *todo:sur
+    ;;(todo:sur !<(* u.-))
   :_  this(todo todo)
   :~
   (fact:io [%domevents !>([dap.bowl.bowl ~[%click %mouseenter %mouseleave]])] [/event-listeners]~)

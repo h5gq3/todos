@@ -10,7 +10,7 @@ $:  todos=todos:sur
 ^-  web-component:ui4
 =|  state
 =*  state  -
-|_  [props=(unit vase) children=marl =bowl:ui4]
+|_  [props=(map mane vase) children=marl =bowl:ui4]
 ::
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
@@ -96,6 +96,6 @@ $:  todos=todos:sur
 ++  view
 ;div
   ;todoinput.sail-component;
- ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(props (s:ui4 todo), key <`@`id>);))
+ ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(todo (s:ui4 todo), key <`@`id>);))
 ==
 --

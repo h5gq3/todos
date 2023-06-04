@@ -2,7 +2,7 @@
 /+  ui4, agentio, default-agent
 
 ^-  web-component:ui4
-|_  [props=(unit vase) children=marl =bowl:ui4]
+|_  [props=(map mane vase) children=marl =bowl:ui4]
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
     io  ~(. agentio bowl.bowl)
