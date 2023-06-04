@@ -12,6 +12,7 @@
 +$  bowl
   $:  dit=term
       cab=term
+      url-path=path
       =bowl:gall
   ==
 ::
@@ -22,9 +23,9 @@
   ==
 ::
 ++  make-bowl
-  |=  [=bowl:gall [dit=term cab=term]]
+  |=  [=bowl:gall [dit=term cab=term url-path=path]]
   ^-  ^bowl
-  [dit cab bowl]
+  [dit cab url-path bowl]
 ::
 ++  all-domevents-json
   |=  events=(list [@t (list term)])
@@ -62,6 +63,7 @@
     [^$(a i.c, self +(self)) (cloop(self +(self)) t.c)]
   --
 ++  generate-id
+  |=  web=flag
   |=  [=marx p=@ s=@]  ^-  ^marx
   ?:  ?=(%$ n.marx)  marx
   ?:  ?=(html-tag:html-tag n.marx)  marx
@@ -78,13 +80,23 @@
     :: :(mul (mug n.marx) p s)
   =.  a.marx
   (snoc a.marx [%sail-id (weld "c" (a-co:co id))])
-  marx
+  ?.  web  marx
+  marx(n %div)
 ::
 ++  with-id
-  |=  [=manx dit=term]
+  |=  [=manx dit=term web=flag]
   ^-  ^manx
-  (apply-elem manx (mug dit) 0 generate-id)
+  (apply-elem manx (mug dit) 0 (generate-id web))
 ::
+++  make-div-tagged
+  |=  =marx  ^-  ^marx
+  ?:  ?=(%$ n.marx)  marx
+  ?:  ?=(html-tag:html-tag n.marx)  marx
+  marx(n %div)
+++  div-tagged
+  |=  =manx
+  ^-  ^manx
+  (~(apply-elem manx-tools manx) make-div-tagged)
 ++  web-component
   $_  ^|
   |_  [props=(unit vase) children=marl =bowl]
@@ -166,6 +178,8 @@
   // this is used to prevent events from firing multiple times for the same sail-id
   var eventToggles = new Map();
 
+  const rootPath = window.location.pathname;
+
   // for debugging
   window.innerHTML = innerHTML;
   window.outerHTML = outerHTML;
@@ -244,6 +258,17 @@
           })
   }
 
+  function navigationPoke(path) \{
+          //console.log('navigationPoke', path)
+          api.poke(\{
+              app: "{(trip dap.bowl)}",
+              mark: "ui",
+              json: \{'new-path':path},
+              onSuccess: () => handlePokeAck(listener, event),
+              onError: () => console.log('Error poke')
+          })
+  }
+
   function kick(component) \{
       console.log('kick', component)
       var el = document.querySelector(`[sail-id='$\{component}']`);
@@ -254,7 +279,6 @@
       }
 
   }
-
 
 
   // add listeners to document
@@ -330,20 +354,20 @@
         let newComponents = Array.from(document.querySelectorAll('.sail-component')).map((e) => e.getAttribute('sail-id'));
         // get new components
         let diff = getUniqueElements(components, newComponents);
-        let old = getUniqueElements(newComponents, components);
+        //let old = getUniqueElements(newComponents, components);
         // unsubscribe from old components
-        old.forEach((component) => \{
-            console.log('unsubscribing from', component)
-            release(document.querySelector(`[sail-id='$\{component}']`));
-            // remove from eventListeners map
-            eventListeners.forEach((value, key) => \{
-                if (value.includes(component)) \{
-                    eventListeners.set(key, value.filter((el) => el !== component))
-                }
-            eventToggles.delete(component)
-            })
-        
-        });
+        //old.forEach((component) => \{
+        //    console.log('unsubscribing from', component)
+        //    release(document.querySelector(`[sail-id='$\{component}']`));
+        //    // remove from eventListeners map
+        //    eventListeners.forEach((value, key) => \{
+        //        if (value.includes(component)) \{
+        //            eventListeners.set(key, value.filter((el) => el !== component))
+        //        }
+        //    eventToggles.delete(component)
+        //    })
+        //
+        //});
         // update components
         components = newComponents;
         // subscribe to new components
@@ -394,11 +418,27 @@
           err: () => console.log('Error')
         });
   });
+
+  function handleNavigation(e) \{
+    console.log('handleNavigation', e)
+    // use history api to update url
+    history.pushState(\{}, '', rootPath + e);
+  }
+
+  // subscribe to navigation events
+  api.subscribe(\{
+          app: "{(trip dap.bowl)}",
+          path: '/new-url-path',
+          event: (e) => handleNavigation(e),
+          quit: () => console.log('quit'),
+          err: () => console.log('Error')
+        });
   """
 --
 ::
 ++  agent
   |=  [[component=web-component =components] =agent:gall]
+  =|  ag-init=flag
   ^-  agent:gall
   |_  =bowl:gall
   +*  this  .
@@ -410,25 +450,34 @@
     ^-  (quip card:agent:gall agent:gall)
     ::  on initial agent creation, we loop through the root component's manx from view:og
     ::  we collect cards and put the produced manx and state to wrapper state map
-    ::  all subsequent calls to this on-init will come from this on-poke
+    ::  all subsequent calls to this on-init will come from this on-poke (.ag-init is |)
     ::  these calls initialize new components and put their produced manx and state to wrapper state map
     ::
     ::  check if root view is in state
     ::  if not, this means we're at initial agent on-init and need to put root view to state
-    =^  cards  agent  on-init:ag
+    =^  cards  agent
+      ?.  ag-init  `agent
+      on-init:ag
+    ::  if initial agent on-init, put root view mold to components
+    =?  components  ag-init
+      (~(put by components) [%root component])
+    =/  dit
+      ?:  ag-init  %root  dit.bowl.cs
+    =/  cab
+      ?:  ag-init  %root  cab.bowl.cs
+    ?:  (~(has by components-state) dit)  [cards this]
     =^  og-cards  component  on-init:og
     =/  state  on-save:og
-    =/  view  (with-id view:og dit.bowl.cs)
+    =/  view  (with-id view:og dit |)
     =.  components-state
-      ?.  (~(has by components-state) %root)
-        (~(put by components-state) %root [%root state view props.cs children.cs])
-      (~(put by components-state) dit.bowl.cs [cab.bowl.cs state view props.cs children.cs])
-    :: =.  components-state
+      (~(put by components-state) dit [cab state view props.cs children.cs])
     =/  flat-manx=(list manx)  ~(lvl-flatten-innertext manx-tools view)
     =.  flat-manx
       %+  skip  flat-manx
       |=  =manx
       |(?=(html-tag:html-tag n.g.manx) ?=(%$ n.g.manx))
+    :: ~&  "flat-manx"
+    :: ~&  flat-manx
     =/  components-list
       %+  turn  `(list manx)`flat-manx
       |=  =manx
@@ -446,13 +495,25 @@
           `!>((cue (slav %ud (crip u.props))))
           ::
           c.manx
+    =.  components-list
+      %+  skip  components-list
+      |=  [dit=term cab=term pop=(unit vase) sot=marl]
+      (~(has by components-state) dit)
     =/  new-component-cards
       %+  turn  components-list
         |=  [dit=term cab=term pop=(unit vase) sot=marl]
         ^-  card:agent:gall
+        ~&  "new-component-cards"
+        ~&  dit
+        ~&  cab
         :: [%pass /start-agent %arvo %g [%jole q.byk.bowl dap !>(agent)]]
         [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop sot]])]]
+    :: ~&  "dit at watch-path-change-card"
+    :: ~&  dit
+    =/  watch-path-change=card:agent:gall
+      [%pass /component/[dit]/new-url-path %agent [our.bowl dap.bowl] %watch /new-url-path]
     =.  cards  :(weld new-component-cards og-cards cards)
+    =.  cards  (snoc cards watch-path-change)
     :: [cards this(current-manx (component-div-tag (with-id view:og)))]
     [cards this]
     :: [~ this]
@@ -493,7 +554,7 @@
                 :_  this
                 =/  c
                   (~(got by components-state) %root)
-                (manx-response:gen:server (full-document viw.c bowl))
+                (manx-response:gen:server (full-document (div-tagged viw.c) bowl))
             ==
         ==
         [cards this]
@@ -502,19 +563,19 @@
         ?-  -.poke
           %domevent
                 =/  dit=term  target:+>.poke
-                ~&  dit
+                :: ~&  dit
                 =/  c  (~(get by components-state) dit)
                 ?~  c
                 ::::~&  "no component found"
                 `this
                 =/  mold  (~(get by components) cab.u.c)
                 ?~  mold  `this
-                =/  bowl  (make-bowl bowl [dit cab.u.c])
+                =/  bowl  (make-bowl bowl [dit cab.u.c url-path])
                 =.  component  u.mold(bowl bowl)
                 =^  cards  component  (on-load:og sta.u.c)
                 =^  cards  component  (on-poke:og [mark vase])
                 =/  new-state  on-save:og
-                =/  new-view  (with-id view:og dit)
+                =/  new-view  (with-id view:og dit &)
                 =/  view-fact
                   [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html new-view))]]
                 =.  components-state
@@ -523,8 +584,8 @@
                 [cards this]
           %new-component
             =/  c  (~(got by components) cab.poke)
-            =/  bowl  (make-bowl bowl [dit.poke cab.poke])
-            =/  [cards=(list card:agent:gall) this=agent:gall]  on-init(component c(bowl bowl, props pop.poke, children sot.poke))  ::TODO|DONE what do with dit.poke?
+            =/  bowl  (make-bowl bowl [dit.poke cab.poke url-path])
+            =/  [cards=(list card:agent:gall) this=agent:gall]  on-init(ag-init |, component c(bowl bowl, props pop.poke, children sot.poke))  ::TODO|DONE what do with dit.poke?
             :: =^  cards  this  on-init(component ~(. c [pop.poke *marl bowl]))  ::TODO|DONE what do with dit.poke?
             ::TODO watch card paths we need to put to wrapper state
             [cards this]
@@ -534,14 +595,14 @@
             =.  components-state  (~(del by components-state) dit.poke)
             `this
           %forward-subscription
-            ~&  "forward-subscription"
+            :: ~&  "forward-subscription"
             =/  c  (~(got by components-state) dit.poke)
             =/  mold  (~(got by components) cab.c)
             =^  cards  component  (on-load:og sta.c)
             =^  cards  component  (on-agent:og wire.poke sign.poke)
             :: get new state and view
             =/  state  on-save:og
-            =/  view  (with-id view:og dit.poke)
+            =/  view  (with-id view:og dit.poke &)
             =/  view-fact
               [%give %fact ~[/[dit.poke]/view] [%tape !>((en-xml:html view))]]
             :: update wrapper state
@@ -549,6 +610,11 @@
               (~(put by components-state) dit.poke [cab.c state view pop.c sot.c])
             =.  cards  (snoc cards view-fact)
             [cards this]
+          %new-path
+            :_  this(url-path path.poke)
+            :~
+              [%give %fact ~[/new-url-path] [%path !>(path.poke)]]
+            ==
         ==
     ==
   ::
@@ -568,15 +634,16 @@
         :_  this
         =/  c  (~(got by components-state) -.path)
         :~
-          [%give %fact ~ [%tape !>((en-xml:html viw.c))]]
+          [%give %fact ~ [%tape !>((en-xml:html (div-tagged viw.c)))]]
         ==
       [%event-listeners term ~]  ::TODO
       [~ this]
+      [%new-url-path ~]  `this
       [%component *]
         =/  dit  +<.path
         =/  c  (~(got by components-state) dit)
         =/  mold  (~(got by components) cab.c)
-        =/  c-bowl  (make-bowl bowl [dit cab.c])
+        =/  c-bowl  (make-bowl bowl [dit cab.c url-path])
         =.  component  mold(bowl c-bowl, props pop.c, children sot.c)
         =^  cards  component  (on-load:og sta.c)
         =^  cards  component  (on-watch:og +>.path)  ::TODO update component [state view] in wrapper state map
@@ -596,7 +663,7 @@
   ::
   ++  on-agent
     |=  [=wire =sign:agent:gall]
-    ~&  >  'on-agent-lib'  ~&  wire
+    :: ~&  >  'on-agent-lib'  ~&  wire
     ^-  (quip card:agent:gall agent:gall)
     ?.  ?=([%component term *] wire)
       =^  cards  agent  (on-agent:ag wire sign)
@@ -604,15 +671,24 @@
     =/  dit  +<.wire
     =/  c  (~(got by components-state) dit)
     =/  mold  (~(got by components) cab.c)
-    =/  c-bowl  (make-bowl bowl [dit cab.c])
+    =/  c-bowl  (make-bowl bowl [dit cab.c url-path])
     =.  component  mold(bowl c-bowl, props pop.c, children sot.c)
     =^  cards  component  (on-load:og sta.c)
-    =^  cards  component  (on-agent:og +>.wire sign)
+    =^  cards  component
+    ::  if wire is %new-url-path we handle it here, otherwise we pass sign to the component
+    ?:  ?=([%component term %new-url-path ~] wire)
+      [cards component]
+    (on-agent:og +>.wire sign)
     :: get new state and view
     =/  state  on-save:og
-    =/  view  (with-id view:og dit)
+    =/  view-web  (with-id view:og dit &)
+    =/  view  (with-id view:og dit |)
+    ::  if views and state are same we don't update or send new view to FE
+    ?:  &(=(state sta.c) =(view:og viw.c))
+      ~&  "state and view same, not updating"
+      `this
     =/  view-fact
-      [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html view))]]
+      [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html view-web))]]
     =/  flat-new
       %+  skip  ~(lvl-flatten-innertext manx-tools view)
       |=  =manx
@@ -640,7 +716,7 @@
         |=  man=manx
         =+  (skim ^flat-new |=(man=manx =((need (~(get-attr manx-tools *manx) g.man %sail-id)) (need (~(get-attr manx-tools *manx) g.^man %sail-id)))))
         ?~  -  ~&  "not found id from flat-new"  man
-        ~&  "found id from flat-new"
+        :: ~&  "found id from flat-new"
         i.-
         ::
           %~  tap  in
@@ -676,6 +752,8 @@
         ^-  card:agent:gall
         [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop sot]])]]
     =/  remove-component-cards
+      ::  if wire is %new-url-path we don't delete components from state
+      ?:  ?=([%component term %new-url-path ~] wire)  ~
       %+  turn  to-be-removed-components-list
         |=  dit=term
         ~&  "nuke-agent"

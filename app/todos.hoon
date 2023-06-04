@@ -4,10 +4,13 @@
 /=  todocontainer  /app/components/todocontainer
 /=  todoinput  /app/components/todoinput
 /=  todo-component  /app/components/todo
+/=  menu  /app/components/menu
+/=  link  /app/components/link
+
 ::/~  components  web-component:ui4  /components
 
 =/  components=(map term web-component:ui4)
-  (~(gas by *(map term web-component:ui4)) ~[todocontainer+todocontainer todo+todo-component todoinput+todoinput])
+  (~(gas by *(map term web-component:ui4)) ~[todocontainer+todocontainer todo+todo-component todoinput+todoinput [%'Menu' menu] [%'Link' link]])
 
 |%
 +$  pokes

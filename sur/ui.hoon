@@ -2,6 +2,7 @@
 +$  wrapper-state
   $:  components-state=(map dit=term component-state)
       subscriptions=(map path (list term))
+      url-path=path
   ==
 +$  component-state
   $:  cab=term
@@ -15,6 +16,7 @@
       [%new-component [dit=term cab=term pop=(unit vase) sot=marl]]
       [%remove-component dit=term]
       [%forward-subscription [dit=term [=wire =sign:agent:gall]]]
+      [%new-path =path]
   ==
 +$  dom-event
   $%  [%click click-event]
@@ -46,6 +48,7 @@
   |^
   %-  of
   :~  domevent+dom-event
+      new-path+pa
   ==
   ++  dom-event
   %-  of

@@ -94,8 +94,19 @@ $:  todos=todos:sur
   ^-  (quip card:agent:gall _this)
   `this
 ++  view
-;div
-  ;todoinput.sail-component;
- ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(props (s:ui4 todo), key <`@`id>);))
-==
+  =/  default
+    ;div
+      ;todoinput.sail-component;
+    ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(props (s:ui4 todo), key <`@`id>);))
+    ==
+  =/  some-other-view
+    ;div
+      ;p:"some other view"
+    ==
+  ?+  url-path.bowl  default
+      ~
+    default
+      [%other ~]
+    some-other-view
+  ==
 --

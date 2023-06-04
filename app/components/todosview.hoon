@@ -49,15 +49,22 @@
   ;div.bg-white.rounded-lg.shadow-lg.max-w-lg
     ;div.p-4
       ;h2.text-2xl.font-bold.m-0
-        ;span.text-gray-500.mr-1
-          ;i.fas.fa-check-square;
-        ==
         ;span: todos
+      ==
+      ;Menu.sail-component
+        ;Link.sail-component
+          ;span: all todos
+        ==
+        ;Link.sail-component
+          ;span: active
+        ==
+        ;Link.sail-component
+          ;span: completed
+        ==
       ==
       ;div.mt-4
         :: ;todoinput;
         ;div.flex.flex-row
-          ;todocontainer.sail-component;
           ;todocontainer.sail-component;
         ==
       ==

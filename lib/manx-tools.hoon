@@ -442,8 +442,7 @@
   %-  lvl-fold-manx
   |=  [a=manx l=marl]
   ?~  c.a  [[g.a ~] l]
-  ?:  ?=(%$ n.g.i.c.a)  [[g.a c.a] l]
-  [[g.a ~] l]
+  [[g.a c.a] l]
 :: lvl-flatten-innertext-sail-id
 ::
 ::   get a list of elements by level order traversal with element's inner text intact and all attributes removed except for the sail id
