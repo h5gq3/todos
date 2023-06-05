@@ -52,13 +52,13 @@
         ;span: todos
       ==
       ;Menu.sail-component
-        ;Link.sail-component(to (s:ui4 /))
+        ;Link.sail-component(to (s:ui4 /), clicked-style (s:ui4 "font-bold"))
           ;span: all todos
         ==
-        ;Link.sail-component(to (s:ui4 /active))
+        ;Link.sail-component(to (s:ui4 /active), clicked-style (s:ui4 "font-bold"))
           ;span: active
         ==
-        ;Link.sail-component(to (s:ui4 /completed))
+        ;Link.sail-component(to (s:ui4 /completed), clicked-style (s:ui4 "font-bold"))
           ;span: completed
         ==
       ==

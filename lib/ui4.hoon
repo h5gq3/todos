@@ -422,7 +422,8 @@
   function handleNavigation(e) \{
     console.log('handleNavigation', e)
     // use history api to update url
-    history.pushState(\{}, '', rootPath + e);
+    let path = e === '/' ? rootPath : rootPath + e;
+    history.pushState(\{}, '', path);
   }
 
   // subscribe to navigation events
@@ -465,10 +466,18 @@
       ?:  ag-init  %root  dit.bowl.cs
     =/  cab
       ?:  ag-init  %root  cab.bowl.cs
-    ?:  (~(has by components-state) dit)  [cards this]
+    ?:  (~(has by components-state) dit)
+    :: ~&  "has by components-state"
+    :: ~&  dit
+    [cards this]
     =^  og-cards  component  on-init:og
     =/  state  on-save:og
     =/  view  (with-id view:og dit |)
+    ::     ~&  "put by components-state"
+    :: ~&  dit
+    :: ~&  cab
+    :: ~&  props.cs
+    :: ~&  children.cs
     =.  components-state
       (~(put by components-state) dit [cab state view props.cs children.cs])
     =/  flat-manx=(list manx)  ~(lvl-flatten-innertext manx-tools view)
@@ -503,17 +512,14 @@
           !>((cue u.-))
           ::
           c.manx
-    =.  components-list
-      %+  skip  components-list
-      |=  [dit=term cab=term pop=(unit vase) sot=marl]
-      (~(has by components-state) dit)
     =/  new-component-cards
       %+  turn  components-list
         |=  [dit=term cab=term pop=(map mane vase) sot=marl]
         ^-  card:agent:gall
-        ~&  "new-component-cards"
-        ~&  dit
-        ~&  cab
+        :: ~&  "new-component-cards"
+        :: ~&  dit
+        :: ~&  cab
+        :: ~&  pop
         :: [%pass /start-agent %arvo %g [%jole q.byk.bowl dap !>(agent)]]
         [%pass /new-component %agent [our.bowl dap.bowl] %poke [%ui !>([%new-component [dit cab pop sot]])]]
     :: ~&  "dit at watch-path-change-card"
@@ -578,7 +584,7 @@
                 =/  mold  (~(get by components) cab.u.c)
                 ?~  mold  `this
                 =/  bowl  (make-bowl bowl [dit cab.u.c url-path])
-                =.  component  u.mold(bowl bowl)
+                =.  component  u.mold(bowl bowl, props pop.u.c, children sot.u.c)
                 =^  cards  component  (on-load:og sta.u.c)
                 =^  cards  component  (on-poke:og [mark vase])
                 =/  new-state  on-save:og
@@ -692,7 +698,7 @@
     =/  view  (with-id view:og dit |)
     ::  if views and state are same we don't update or send new view to FE
     ?:  &(=(state sta.c) =(view:og viw.c))
-      ~&  "state and view same, not updating"
+      :: ~&  "state and view same, not updating"
       `this
     =/  view-fact
       [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html view-web))]]
@@ -771,8 +777,8 @@
       ?:  ?=([%component term %new-url-path ~] wire)  ~
       %+  turn  to-be-removed-components-list
         |=  dit=term
-        ~&  "nuke-agent"
-        ~&  dit
+        :: ~&  "nuke-agent"
+        :: ~&  dit
         ^-  card:agent:gall
         :*  %pass  /nuke-component  %agent  [our.bowl dap.bowl]
           %poke  %ui  !>([%remove-component dit])

@@ -97,16 +97,33 @@ $:  todos=todos:sur
   =/  default
     ;div
       ;todoinput.sail-component;
-    ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(props (s:ui4 todo), key <`@`id>);))
+    ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(todo (s:ui4 todo), key <`@`id>);))
     ==
-  =/  some-other-view
+  =/  completed
+    =.  todos
+      %+  skim  todos
+      |=  [=id:sur =todo:sur]
+      done.todo
     ;div
-      ;p:"some other view"
+      ;todoinput.sail-component;
+    ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(todo (s:ui4 todo), key <`@`id>);))
     ==
+  =/  active
+    =.  todos
+      %+  skip  todos
+      |=  [=id:sur =todo:sur]
+      done.todo
+    ;div
+      ;todoinput.sail-component;
+    ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(todo (s:ui4 todo), key <`@`id>);))
+    ==
+  ::
   ?+  url-path.bowl  default
       ~
     default
-      [%other ~]
-    some-other-view
+      [%completed ~]
+    completed
+      [%active ~]
+    active
   ==
 --

@@ -2,21 +2,38 @@
 /-  ui
 /+  ui4, default-agent
 
+|%
++$  state
+$:  clicked=_|
+    current-url-path=path
+==
+--
+
 ^-  web-component:ui4
-:: =|  state
-:: =*  state  -
+=|  state
+=*  state  -
 |_  [props=(map mane vase) children=marl =bowl:ui4]
 ::
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
-    to      (~(get by props) %to)
+    :: to      (~(get by props) %to)
 ::
 ++  on-init
   ^-  (quip card:agent:gall _this)
   `this
 ++  on-peek  on-peek:default
-++  on-load  on-load:default
-++  on-save  on-save:default
+++  on-load
+  |=  =old-state=vase
+  =+  !<(old-state=^state old-state-vase)
+  :: we check if url-path has changed after we recorded the url-path at link click
+  =?  clicked.old-state  !=(current-url-path.old-state url-path.bowl)
+    |
+  =?  current-url-path.old-state  !=(current-url-path.old-state url-path.bowl)
+    url-path.bowl
+  `this(state old-state)
+++  on-save
+  ^-  vase
+  !>(state)
 ++  on-watch
   |=  =path
   :: ~&  >  'todocontainer on-watch'
@@ -34,6 +51,9 @@
 ++  on-arvo  on-arvo:default
 ++  on-poke
   |=  [=mark =vase]
+  :: ~&  >  'link on-poke'
+  :: ~&  props
+  :: ~&  children
   ^-  (quip card:agent:gall _this)
     ?+  mark  `this
         %ui
@@ -42,17 +62,30 @@
             %domevent
           ?+  +<.poke  `this
               %click
+            :: ~&  >  'link click on-poke'
+            =/  to  (~(get by props) %to)
+            ?~  to
+            :: ~&  "link to null"
+            `this  ::TODO handle null props
             =/  go-to
-              ?~  to  `this  ::TODO handle null props
-              ;;(path !<(* to))
+              ;;(path !<(* u.to))
             =/  card
-              [%pass /navigation-poke %agent [our.bow.bowl dap.bowl.bowl] %poke [%ui !>([%new-path go-to])]]
+              [%pass /navigation-poke %agent [our.bowl.bowl dap.bowl.bowl] %poke [%ui !>([%new-path go-to])]]
+            :: ~&  >  'go to path'
+            :: ~&  go-to
+            =.  clicked  &
+            =.  current-url-path  url-path.bowl
             [[card]~ this]
           ==
         ==
     ==
 ++  view
-;div
-  ;*  children
+=/  clicked-style=tape
+=+  (~(get by props) %clicked-style)
+?~  -  ""
+?.  clicked  ""
+;;(tape !<(* u.-))
+;div.m-1
+  ;*  (turn children |=(c=manx =.(a.g.c (weld a.g.c `mart`~[[%ref <dit.bowl>] [%class clicked-style]]) c)))  ::TODO test deeper children
 ==
 --
