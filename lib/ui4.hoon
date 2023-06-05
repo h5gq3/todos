@@ -712,12 +712,12 @@
     =/  state  on-save:og
     =/  view-web  (with-id view:og dit &)
     =/  view  (with-id view:og dit |)
-    ~&  wire
-    ~&  view
-    ~&  viw.c
+    :: ~&  wire
+    :: ~&  view
+    :: ~&  viw.c
     ::  if views and state are same we don't update or send new view to FE
     ?:  &(=(state sta.c) =(view viw.c))
-      ~&  "state and view same, not updating"
+      :: ~&  "state and view same, not updating"
       `this
     =/  view-fact
       [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html view-web))]]

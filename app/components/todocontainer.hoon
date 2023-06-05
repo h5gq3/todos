@@ -77,6 +77,17 @@ $:  todos=todos:sur
         :: ~&  "removing todo"
         :: ~&  (skip todos |=(=todo:sur =(todo !<(todo:sur q.cage.sign))))
       [~ this(todos (skip todos |=([=id:sur =todo:sur] =(todo !<(todo:sur q.cage.sign)))))]
+        [%clear-todos ~]
+      [~ this(todos ~)]
+        [%mark-done ~]
+      =/  todo  !<(todo:sur q.cage.sign)
+      =.  todos
+        %+  turn  todos
+        |=  [=id:sur =todo:sur]
+        ?:  =(todo ^todo)
+          [id todo(done !done.todo)]
+        [id todo]
+      [~ this]
     ==
   ==
 ++  on-fail  on-fail:default
