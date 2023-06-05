@@ -5,11 +5,11 @@
 ^-  web-component:ui4
 :: =|  state
 :: =*  state  -
-|_  [props=(unit vase) children=marl =bowl:ui4]
+|_  [props=(map mane vase) children=marl =bowl:ui4]
 ::
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
-    :: props  ;;  (map term vase)  ::TODO
+    to      (~(get by props) %to)
 ::
 ++  on-init
   ^-  (quip card:agent:gall _this)
@@ -36,14 +36,21 @@
   |=  [=mark =vase]
   ^-  (quip card:agent:gall _this)
     ?+  mark  `this
-    %ui
-    =/  poke  !<(ui-poke:ui vase)
-    ?+  -.poke  `this
-      %domevent
-        ?+  +<.poke  `this
-          %click  `this  ::TODO
-
-
+        %ui
+      =/  poke  !<(ui-poke:ui vase)
+        ?+  -.poke  `this
+            %domevent
+          ?+  +<.poke  `this
+              %click
+            =/  go-to
+              ?~  to  `this  ::TODO handle null props
+              ;;(path !<(* to))
+            =/  card
+              [%pass /navigation-poke %agent [our.bow.bowl dap.bowl.bowl] %poke [%ui !>([%new-path go-to])]]
+            [[card]~ this]
+          ==
+        ==
+    ==
 ++  view
 ;div
   ;*  children
