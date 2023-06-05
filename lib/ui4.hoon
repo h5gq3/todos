@@ -555,19 +555,26 @@
       %handle-http-request
         =^  cards  this
         =+  !<([=eyre-id =inbound-request:eyre] vase)
+        =/  path  (stab url.request.inbound-request)
+        =/  navigation-card
+          [%pass /navigation-poke %agent [our.bowl dap.bowl] %poke [%ui !>([%new-path +.path])]]
+        =/  c
+          (~(got by components-state) %root)
+        =/  document
+          (manx-response:gen:server (full-document (div-tagged viw.c) bowl))
         =;  [=simple-payload:http =_this]
-        :_  this
-        %+  give-simple-payload:app:server
+        =/  payload-cards
+          %+  give-simple-payload:app:server
           eyre-id
           simple-payload
+        :_  this
+        %+  snoc  payload-cards
+          navigation-card
         ?+  method.request.inbound-request  [not-found:gen:server this]
           %'GET'
-            ?+  (stab url.request.inbound-request)  [not-found:gen:server this]
-              [@ ~]
-                :_  this
-                =/  c
-                  (~(got by components-state) %root)
-                (manx-response:gen:server (full-document (div-tagged viw.c) bowl))
+            ?+  path  [document this]
+                [@ ~]
+              [document this]
             ==
         ==
         [cards this]
@@ -624,6 +631,8 @@
             =.  cards  (snoc cards view-fact)
             [cards this]
           %new-path
+          ~&  >  'new-path'
+          ~&  path.poke
             :_  this(url-path path.poke)
             :~
               [%give %fact ~[/new-url-path] [%path !>(path.poke)]]
