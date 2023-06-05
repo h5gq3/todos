@@ -10,7 +10,7 @@ $:  todos=todos:sur
 ^-  web-component:ui4
 =|  state
 =*  state  -
-|_  [props=(unit vase) children=marl =bowl:ui4]
+|_  [props=(map mane vase) children=marl =bowl:ui4]
 ::
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
