@@ -20,7 +20,7 @@ $:  clicked=_|
 ::
 ++  on-init
   ^-  (quip card:agent:gall _this)
-  `this
+  `this(current-url-path url-path.bowl)
 ++  on-peek  on-peek:default
 ++  on-load
   |=  =old-state=vase
@@ -73,18 +73,25 @@ $:  clicked=_|
               [%pass /navigation-poke %agent [our.bowl.bowl dap.bowl.bowl] %poke [%ui !>([%new-path go-to])]]
             :: ~&  >  'go to path'
             :: ~&  go-to
-            =.  clicked  &
+            :: =.  clicked  &
             =.  current-url-path  url-path.bowl
             [[card]~ this]
           ==
         ==
     ==
 ++  view
+=/  to
+  =+  (~(get by props) %to)
+  ?~  -  /
+  ;;(path !<(* u.-))
 =/  clicked-style=tape
 =+  (~(get by props) %clicked-style)
 ?~  -  ""
-?.  clicked  ""
+~&  "to and current url-path are equal"
+~&  =(current-url-path to)
+?.  =(current-url-path to)  ""
 ;;(tape !<(* u.-))
+::
 ;div.m-1
   ;*  (turn children |=(c=manx =.(a.g.c (weld a.g.c `mart`~[[%ref <dit.bowl>] [%class clicked-style]]) c)))  ::TODO test deeper children
 ==

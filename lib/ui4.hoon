@@ -161,6 +161,8 @@
     ;+  view
     ==
   ++  script
+  ::TODO
+  :: rootPath is wrong atm - we need to get the path that eyre actually binds
   """
   import Urbit from 'https://cdn.skypack.dev/@urbit/http-api';
 
@@ -595,9 +597,10 @@
                 =^  cards  component  (on-load:og sta.u.c)
                 =^  cards  component  (on-poke:og [mark vase])
                 =/  new-state  on-save:og
-                =/  new-view  (with-id view:og dit &)
+                =/  new-view  (with-id view:og dit |)
+                =/  web-view  (with-id view:og dit &)
                 =/  view-fact
-                  [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html new-view))]]
+                  [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html web-view))]]
                 =.  components-state
                   (~(put by components-state) dit [cab.u.c new-state new-view pop.u.c sot.u.c])
                 =.  cards  (snoc cards view-fact)
