@@ -693,6 +693,9 @@
     ?.  ?=([%component term *] wire)
       =^  cards  agent  (on-agent:ag wire sign)
       [cards this]
+    ?.  ?=(%fact -.sign)
+    ~&  "not a fact"
+    `this
     =/  dit  +<.wire
     =/  c  (~(got by components-state) dit)
     =/  mold  (~(got by components) cab.c)
@@ -702,15 +705,19 @@
     =^  cards  component
     ::  if wire is %new-url-path we handle it here, otherwise we pass sign to the component
     ?:  ?=([%component term %new-url-path ~] wire)
+      :: ~&  "new-url-path wire"
       [cards component]
     (on-agent:og +>.wire sign)
     :: get new state and view
     =/  state  on-save:og
     =/  view-web  (with-id view:og dit &)
     =/  view  (with-id view:og dit |)
+    ~&  wire
+    ~&  view
+    ~&  viw.c
     ::  if views and state are same we don't update or send new view to FE
-    ?:  &(=(state sta.c) =(view:og viw.c))
-      :: ~&  "state and view same, not updating"
+    ?:  &(=(state sta.c) =(view viw.c))
+      ~&  "state and view same, not updating"
       `this
     =/  view-fact
       [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html view-web))]]

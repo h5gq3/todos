@@ -74,7 +74,7 @@ $:  clicked=_|
             :: ~&  >  'go to path'
             :: ~&  go-to
             :: =.  clicked  &
-            =.  current-url-path  url-path.bowl
+            =.  current-url-path  go-to
             [[card]~ this]
           ==
         ==
@@ -87,12 +87,12 @@ $:  clicked=_|
 =/  clicked-style=tape
 =+  (~(get by props) %clicked-style)
 ?~  -  ""
-~&  "to and current url-path are equal"
-~&  =(current-url-path to)
+:: ~&  "to and current url-path are equal"
+:: ~&  =(current-url-path to)
 ?.  =(current-url-path to)  ""
 ;;(tape !<(* u.-))
 ::
-;div.m-1
+;div.m-1.cursor-pointer
   ;*  (turn children |=(c=manx =.(a.g.c (weld a.g.c `mart`~[[%ref <dit.bowl>] [%class clicked-style]]) c)))  ::TODO test deeper children
 ==
 --
