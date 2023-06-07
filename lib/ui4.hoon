@@ -88,6 +88,12 @@
   ^-  ^manx
   (apply-elem manx (mug dit) 0 (generate-id web))
 ::
+++  make-path
+  |=  =binding:eyre
+  ?~  site.binding  (trip (spat path.binding))
+  %+  weld  (trip u.site.binding)
+  (trip (spat path.binding))
+::
 ++  make-div-tagged
   |=  =marx  ^-  ^marx
   ?:  ?=(%$ n.marx)  marx
@@ -145,7 +151,7 @@
   (map term web-component)
 ::
 ++  full-document
-  |=  [view=manx =bowl:gall]
+  |=  [view=manx =bowl:gall binding=tape]
   ^-  manx
   |^
   ;html(hidden "true")
@@ -161,7 +167,7 @@
     ;+  view
     ==
   ++  script
-  ::TODO
+  ::TODO|DONE
   :: rootPath is wrong atm - we need to get the path that eyre actually binds
   """
   import Urbit from 'https://cdn.skypack.dev/@urbit/http-api';
@@ -180,7 +186,7 @@
   // this is used to prevent events from firing multiple times for the same sail-id
   var eventToggles = new Map();
 
-  const rootPath = window.location.pathname;
+  const rootPath = "{binding}";
 
   // for debugging
   window.innerHTML = innerHTML;
@@ -461,6 +467,18 @@
     =^  cards  agent
       ?.  ag-init  `agent
       on-init:ag
+    ::  if initial agent on-init, we get the eyre binding from cards
+    =?  eyre-binding  ag-init
+      =-  (make-path -)
+      ^-  binding:eyre
+      =/  eyre-card
+        %+  skim  cards
+        |=  =card:agent:gall
+        ?=([%pass ^ %arvo %e %connect *] card)
+      ?~  eyre-card  *binding:eyre
+      =/  card  i.eyre-card
+      ?>  ?=([%pass ^ %arvo %e %connect *] card)
+      binding.q.card
     ::  if initial agent on-init, put root view mold to components
     =?  components  ag-init
       (~(put by components) [%root component])
@@ -563,7 +581,7 @@
         =/  c
           (~(got by components-state) %root)
         =/  document
-          (manx-response:gen:server (full-document (div-tagged viw.c) bowl))
+          (manx-response:gen:server (full-document (div-tagged viw.c) bowl eyre-binding))
         =;  [=simple-payload:http =_this]
         =/  payload-cards
           %+  give-simple-payload:app:server
@@ -609,8 +627,6 @@
             =/  c  (~(got by components) cab.poke)
             =/  bowl  (make-bowl bowl [dit.poke cab.poke url-path])
             =/  [cards=(list card:agent:gall) this=agent:gall]  on-init(ag-init |, component c(bowl bowl, props pop.poke, children sot.poke))  ::TODO|DONE what do with dit.poke?
-            :: =^  cards  this  on-init(component ~(. c [pop.poke *marl bowl]))  ::TODO|DONE what do with dit.poke?
-            ::TODO watch card paths we need to put to wrapper state
             [cards this]
             :: [~ this]
           %remove-component
@@ -659,10 +675,8 @@
         :_  this
         =/  c  (~(got by components-state) -.path)
         :~
-          [%give %fact ~ [%tape !>((en-xml:html (div-tagged viw.c)))]]
+          [%give %fact ~ [%tape !>((en-xml:html (div-tagged viw.c)))]]  ::TODO web viw.c
         ==
-      [%event-listeners term ~]  ::TODO
-      [~ this]
       [%new-url-path ~]  `this
       [%component *]
         =/  dit  +<.path

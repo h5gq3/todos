@@ -3,6 +3,7 @@
   $:  components-state=(map dit=term component-state)
       subscriptions=(map path (list term))
       url-path=path
+      eyre-binding=tape
   ==
 +$  component-state
   $:  cab=term
