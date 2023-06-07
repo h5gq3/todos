@@ -534,7 +534,6 @@
             =/  bowl  (make-bowl bowl [dit.poke cab.poke])
             =/  [cards=(list card:agent:gall) this=agent:gall]  on-init(component c(bowl bowl, props pop.poke, children sot.poke))  ::TODO|DONE what do with dit.poke?
             :: =^  cards  this  on-init(component ~(. c [pop.poke *marl bowl]))  ::TODO|DONE what do with dit.poke?
-            ::TODO watch card paths we need to put to wrapper state
             [cards this]
             :: [~ this]
           %remove-component
@@ -580,8 +579,6 @@
         :~
           [%give %fact ~ [%tape !>((en-xml:html viw.c))]]
         ==
-      [%event-listeners term ~]  ::TODO
-      [~ this]
       [%component *]
         =/  dit  +<.path
         =/  c  (~(got by components-state) dit)
@@ -590,6 +587,14 @@
         =.  component  mold(bowl c-bowl, props pop.c, children sot.c)
         =^  cards  component  (on-load:og sta.c)
         =^  cards  component  (on-watch:og +>.path)  ::TODO update component [state view] in wrapper state map
+        =/  new-state  on-save:og
+        =/  new-view  (with-id view:og dit)
+        =/  view-fact
+          [%give %fact ~[/[dit]/view] [%tape !>((en-xml:html new-view))]]
+        =?  components-state  |(!=(new-view viw.c) !=(new-state sta.c))
+          (~(put by components-state) dit [cab.c new-state new-view pop.c sot.c])
+        =?  cards  !=(new-view viw.c)
+          (snoc cards view-fact)
         [cards this]
     ==
   ::
