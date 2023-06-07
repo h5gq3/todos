@@ -486,6 +486,7 @@
     ?+  mark  =^  cards  agent  (on-poke:ag mark vase)
               [cards this]
       %handle-http-request
+        :: =^  cards  agent  (on-poke:ag mark vase)  ::NOTE we can't do this when ag doesn't handle http request poke. maybe make a channge to default-agent lib?
         =^  cards  this
         =+  !<([=eyre-id =inbound-request:eyre] vase)
         =;  [=simple-payload:http =_this]
@@ -569,7 +570,9 @@
     ^-  (quip card:agent:gall agent:gall)
     ?+  path    =^  cards  agent  (on-watch:ag path)
                 [cards this]
-      [%http-response *]  [~ this]  ::TODO what if ag does http stuff too?
+      [%http-response *]  ::NOTE see above note at %handle-http-request
+      =^  cards  agent  (on-watch:ag path)
+      [cards this]
       ::
       [term %view ~]
         :_  this
