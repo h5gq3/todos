@@ -188,6 +188,8 @@
 
   const rootPath = "{binding}";
 
+  var skipOnnavigate;
+
   // for debugging
   window.innerHTML = innerHTML;
   window.outerHTML = outerHTML;
@@ -199,6 +201,31 @@
   const api = new Urbit("");
   window.api = api
   api.ship = window.ship;
+
+  // when URL is "http://localhost/todos/active" and rootPath is "/todos" we want to return "/active"
+  // when URL is "http://localhost/todos" and rootPath is "/todos" we want to return "/"
+  // without the "http://localhost" part
+  function getRelativePath(url) \{
+    let path = url.slice(url.indexOf(rootPath) + rootPath.length);
+    if (path === '') \{
+      return '/';
+    }
+    return path;
+  }
+  
+
+
+
+  window.navigation.onnavigate = (e) => \{
+    console.log('onnavigate', e);
+    if (skipOnnavigate) \{
+      skipOnnavigate = false;
+      return;
+    }
+    else \{
+      navigationPoke(getRelativePath(e.destination.url));
+    }
+  }
 
 
   var components = Array.from(document.querySelectorAll('.sail-component')).map((e) => e.getAttribute('sail-id'));
@@ -431,6 +458,7 @@
     console.log('handleNavigation', e)
     // use history api to update url
     let path = e === '/' ? rootPath : rootPath + e;
+    skipOnnavigate = true;
     history.pushState(\{}, '', path);
   }
 
@@ -652,10 +680,12 @@
           %new-path
           ~&  >  'new-path'
           ~&  path.poke
-            :_  this(url-path path.poke)
-            :~
-              [%give %fact ~[/new-url-path] [%path !>(path.poke)]]
-            ==
+          ?:  =(path.poke url-path)  `this
+          =/  card
+            [%give %fact ~[/new-url-path] [%path !>(path.poke)]]
+          =?  url-path  !=(path.poke url-path)
+            path.poke
+          [[card]~ this]
         ==
     ==
   ::
