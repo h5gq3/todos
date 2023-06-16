@@ -94,6 +94,7 @@
   %+  weld  (trip u.site.binding)
   (trip (spat path.binding))
 ::
+::TODO  remove props from attributes
 ++  make-div-tagged
   |=  =marx  ^-  ^marx
   ?:  ?=(%$ n.marx)  marx
@@ -188,7 +189,7 @@
 
   const rootPath = "{binding}";
 
-  var skipOnnavigate;
+  var replaceOnNavigateTraverse;
 
   // for debugging
   window.innerHTML = innerHTML;
@@ -214,18 +215,14 @@
   }
   
 
-
-
-  window.navigation.onnavigate = (e) => \{
+  navigation.addEventListener('navigate', (e) => \{
     console.log('onnavigate', e);
-    if (skipOnnavigate) \{
-      skipOnnavigate = false;
-      return;
-    }
-    else \{
+    e.intercept(\{
+      async handler() \{
       navigationPoke(getRelativePath(e.destination.url));
-    }
-  }
+      }
+    });
+  });
 
 
   var components = Array.from(document.querySelectorAll('.sail-component')).map((e) => e.getAttribute('sail-id'));
@@ -276,7 +273,7 @@
       }
   }
 
-  function handlePokeAck(listener, event) \{
+  function handleEventPokeAck(listener, event) \{
       console.log('handlePokeAck', listener, event)
       var id = target(event);
       eventToggles.get(id)[listener] = false;
@@ -288,19 +285,19 @@
               app: "{(trip dap.bowl)}",
               mark: "ui",
               json: \{domevent:\{[listener]:createListenerObject(listener, event)}},
-              onSuccess: () => handlePokeAck(listener, event),
+              onSuccess: () => handleEventPokeAck(listener, event),
               onError: () => console.log('Error poke')
           })
   }
 
   function navigationPoke(path) \{
-          //console.log('navigationPoke', path)
+          console.log('navigationPoke', path)
           api.poke(\{
               app: "{(trip dap.bowl)}",
               mark: "ui",
               json: \{'new-path':path},
-              onSuccess: () => handlePokeAck(listener, event),
-              onError: () => console.log('Error poke')
+              onSuccess: () => console.log('Success navigation poke'),
+              onError: () => console.log('Error navigation poke')
           })
   }
 
@@ -454,19 +451,12 @@
         });
   });
 
-  function handleNavigation(e) \{
-    console.log('handleNavigation', e)
-    // use history api to update url
-    let path = e === '/' ? rootPath : rootPath + e;
-    skipOnnavigate = true;
-    history.pushState(\{}, '', path);
-  }
 
   // subscribe to navigation events
   api.subscribe(\{
           app: "{(trip dap.bowl)}",
           path: '/new-url-path',
-          event: (e) => handleNavigation(e),
+          event: (e) => console.log('nav'),
           quit: () => console.log('quit'),
           err: () => console.log('Error')
         });
@@ -603,7 +593,7 @@
       %handle-http-request
         =^  cards  this
         =+  !<([=eyre-id =inbound-request:eyre] vase)
-        =/  path  (stab url.request.inbound-request)
+        =/  path  (stab url.request.inbound-request) ::TODO stab should be able to parse trailing slash ('/path/' -> /path)
         =/  navigation-card
           [%pass /navigation-poke %agent [our.bowl dap.bowl] %poke [%ui !>([%new-path +.path])]]
         =/  c
@@ -620,6 +610,7 @@
           navigation-card
         ?+  method.request.inbound-request  [not-found:gen:server this]
           %'GET'
+          ~&  'GET'
             ?+  path  [document this]
                 [@ ~]
               [document this]
@@ -683,7 +674,7 @@
           ?:  =(path.poke url-path)  `this
           =/  card
             [%give %fact ~[/new-url-path] [%path !>(path.poke)]]
-          =?  url-path  !=(path.poke url-path)
+          =.  url-path
             path.poke
           [[card]~ this]
         ==

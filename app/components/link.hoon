@@ -92,7 +92,7 @@ $:  clicked=_|
 ?.  =(current-url-path to)  ""
 ;;(tape !<(* u.-))
 ::
-;div.m-1.cursor-pointer
+;a.m-1(href :(weld "/" (trip dap.bowl.bowl) (trip (spat to))))
   ;*  (turn children |=(c=manx =.(a.g.c (weld a.g.c `mart`~[[%ref <dit.bowl>] [%class clicked-style]]) c)))  ::TODO test deeper children
 ==
 --
