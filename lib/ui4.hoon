@@ -187,6 +187,9 @@
   // this is used to prevent events from firing multiple times for the same sail-id
   var eventToggles = new Map();
 
+  // create event queue to store events that need to be fired after eventToggles has been cleared
+  var eventQueue = [];
+
   const rootPath = "{binding}";
 
   var replaceOnNavigateTraverse;
@@ -277,6 +280,10 @@
       console.log('handlePokeAck', listener, event)
       var id = target(event);
       eventToggles.get(id)[listener] = false;
+      if (eventQueue.length > 0) \{
+          var event = eventQueue.shift();
+          eventPoke(event.eventType, event.event);
+      }
   }
 
   function eventPoke(listener, event) \{
@@ -327,6 +334,9 @@
                       eventPoke(event, e)
                       console.log('event-poke', event, e.target, e.currentTarget)
                       eventToggles.get(target(e))[event] = true;
+                    }
+                    else \{
+                      eventQueue.push(\{eventType: event, event: e})
                     }
                   }
               }
