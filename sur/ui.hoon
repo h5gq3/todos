@@ -2,7 +2,7 @@
 +$  wrapper-state
   $:  components-state=(map dit=term component-state)
       subscriptions=(map path (list term))
-      url-path=path
+      url-path=cord
       eyre-binding=tape
   ==
 +$  component-state
@@ -16,14 +16,19 @@
   $%  [%domevent dom-event]
       [%new-component [dit=term cab=term pop=(map mane vase) sot=marl]]
       [%remove-component dit=term]
-      [%forward-subscription [dit=term [=wire =sign:agent:gall]]]
-      [%new-path =path]
+      :: [%forward-subscription [dit=term [=wire =sign:agent:gall]]]
+      [%new-path path=cord]
+  ==
++$  request-line
+  $:  [ext=(unit @ta) site=(list @t)]
+      args=(list [key=@t value=@t])
   ==
 +$  dom-event
   $%  [%click click-event]
       [%keydown key-down-event]
       [%mouseenter mouse-enter-event]
       [%mouseleave mouse-leave-event]
+      :: [%submit form-submit-event]
   ==
 +$  click-event
   $:  target=cord
@@ -31,8 +36,8 @@
   ==
 +$  key-down-event
   $:  target=cord
-      key=cord
       target-id=(unit cord)
+      key=cord
   ==
 +$  mouse-enter-event
   $:  target=cord
@@ -42,21 +47,40 @@
   $:  target=cord
       target-id=(unit cord)
   ==
++$  form-submit-event
+  $:  target=cord
+      target-id=(unit cord)
+      entries=(map cord cord)
+  ==
 
 ::
 ++  json-to-poke
   =,  dejs:format
+  :: ^-  $-(json ui-poke)
+  :: ;;  $-(json ui-poke)
   |^
   %-  of
   :~  domevent+dom-event
-      new-path+pa
+      new-component+new-component
+      remove-component+remove-component
+      new-path+so
+      :: :-  %new-path
+      :: |=  jon=json
+      :: ^-  request-line
+      :: ?>  ?=([%s *] jon)
+      :: (fall (rush p.jon ;~(plug apat:de-purl:html yque:de-purl:html)) [[~ ~] ~])
   ==
+  ++  new-component
+    |=(json *[dit=term cab=term pop=(map mane vase) sot=marl])
+  ++  remove-component
+    |=(json *[dit=term])
   ++  dom-event
   %-  of
   :~  click+click-event
       keydown+key-down-event
       mouseenter+mouse-enter-event
       mouseleave+mouse-leave-event
+      :: submit+form-submit-event
   ==
   ++  click-event
     %-  ot
@@ -83,6 +107,13 @@
     [%target so]
     [%target-id so:dejs-soft]
   ==
+  ++  form-submit-event
+    %-  ot
+    :~
+      [%target so]
+      [%target-id so:dejs-soft]
+      [%entries (cork (ar (at ~[so so])) malt)]
+    ==
   --
 ::
 ++  all-domevents-json

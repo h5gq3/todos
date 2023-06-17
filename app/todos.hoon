@@ -6,11 +6,12 @@
 /=  todo-component  /app/components/todo
 /=  menu  /app/components/menu
 /=  link  /app/components/link
+/=  datepicker  /app/components/datepicker
 
 ::/~  components  web-component:ui4  /components
 
 =/  components=(map term web-component:ui4)
-  (~(gas by *(map term web-component:ui4)) ~[todocontainer+todocontainer todo+todo-component todoinput+todoinput [%'Menu' menu] [%'Link' link]])
+  (~(gas by *(map term web-component:ui4)) ~[todocontainer+todocontainer todo+todo-component todoinput+todoinput datepicker+datepicker [%'Menu' menu] [%'Link' link]])
 
 |%
 +$  pokes

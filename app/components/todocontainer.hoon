@@ -4,6 +4,8 @@
 |%
 +$  state
 $:  todos=todos:sur
+    start-date=tape
+    end-date=tape
 ==
 --
 
@@ -14,6 +16,7 @@ $:  todos=todos:sur
 ::
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
+    :: url-path  (parse-request-line:ui4 url-path.bowl)
 ::
 ++  on-init
   ^-  (quip card:agent:gall _this)
@@ -59,13 +62,17 @@ $:  todos=todos:sur
 ++  on-leave  on-leave:default
 ++  on-agent
   |=  [=wire =sign:agent:gall]
-  :: ~&  >  'on-agent'
-  :: ~&  wire
-  :: ~&  sign
+  ~&  >  'todocontainer on-agent'
+  ~&  wire
+  ~&  sign
   ^-  (quip card:agent:gall _this)
   ?+    -.sign  (on-agent:default wire sign)
       %fact
     ?+    wire  `this
+        [%start-date ~]
+      [~ this(start-date !<(tape q.cage.sign))]
+        [%end-date ~]
+      [~ this(end-date !<(tape q.cage.sign))]
         [%todos ~]
         ~&  "initial todos"
         ~&  !<(todos:sur q.cage.sign)
@@ -116,6 +123,9 @@ $:  todos=todos:sur
       |=  [=id:sur =todo:sur]
       done.todo
     ;div
+      ;datepicker#datepicker.sail-component(subscribe (s:ui4 [dit.bowl ~[/start-date /end-date]]));
+      ;p:"selected start date:{start-date}"
+      ;p:"selected end date:{end-date}"
       ;todoinput.sail-component;
     ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(todo (s:ui4 todo), key <`@`id>);))
     ==
@@ -129,12 +139,13 @@ $:  todos=todos:sur
     ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(todo (s:ui4 todo), key <`@`id>);))
     ==
   ::
-  ?+  url-path.bowl  default
+  =/  url-path  (parse-request-line:ui4 url-path.bowl)
+  ?+  site.url-path  default
       ~
     default
-      [%completed ~]
+      [@ %completed ~]
     completed
-      [%active ~]
+      [@ %active ~]
     active
   ==
 --

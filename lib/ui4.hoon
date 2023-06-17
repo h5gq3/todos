@@ -12,7 +12,7 @@
 +$  bowl
   $:  dit=term
       cab=term
-      url-path=path
+      url-path=cord
       =bowl:gall
   ==
 ::
@@ -23,9 +23,14 @@
   ==
 ::
 ++  make-bowl
-  |=  [=bowl:gall [dit=term cab=term url-path=path]]
+  |=  [=bowl:gall [dit=term cab=term url-path=cord]]
   ^-  ^bowl
   [dit cab url-path bowl]
+::
+++  parse-request-line
+  |=  url=@t
+  ^-  request-line
+  (fall (rush url ;~(plug apat:de-purl:html yque:de-purl:html)) [[~ ~] ~])
 ::
 ++  all-domevents-json
   |=  events=(list [@t (list term)])
@@ -220,11 +225,14 @@
 
   navigation.addEventListener('navigate', (e) => \{
     console.log('onnavigate', e);
-    e.intercept(\{
-      async handler() \{
-      navigationPoke(getRelativePath(e.destination.url));
-      }
-    });
+    if (e.canIntercept) \{
+      e.intercept(\{
+        async handler() \{
+          console.log('intercepting navigation');
+          navigationPoke(getRelativePath(e.destination.url));
+        }
+      });
+    }
   });
 
 
@@ -271,8 +279,8 @@
       return \{
           target: target(event),
           'target-id': event.target.id,
-          ...(listener === 'keydown' && \{key: event.key})
-
+          ...(listener === 'keydown' && \{key: event.key}),
+          ...(listener === 'submit' && \{entries: Array.from(new FormData(event.target).entries())})
       }
   }
 
@@ -287,7 +295,7 @@
   }
 
   function eventPoke(listener, event) \{
-          //console.log('event-poke', listener, event.target, event.currentTarget)
+          console.log('event-poke', listener, event.target)
           api.poke(\{
               app: "{(trip dap.bowl)}",
               mark: "ui",
@@ -322,7 +330,7 @@
 
   // add listeners to document
 
-  ['click', 'keydown', 'mouseenter', 'mouseleave'].forEach((event) => \{
+  ['click', 'keydown', 'mouseenter', 'mouseleave', 'submit'].forEach((event) => \{
       document.addEventListener(event, (e) => \{
           //console.log(e.target.getAttribute('ref'), e.target.getAttribute('sail-id'))
           //console.log('event', event, e.target, eventListeners)
@@ -526,6 +534,13 @@
     :: ~&  cab
     :: ~&  props.cs
     :: ~&  children.cs
+    =/  sub-cards
+      =+  (~(get by props.cs) %subscribe)
+      ?~  -  ~
+      =+  ;;([dit=term paths=(list path)] !<(* u.-))
+      %+  turn  paths
+      |=  =path
+      [%pass :(weld /component /[dit] path) %agent [our.bowl dap.bowl] %watch :(weld /component /[^dit] path)]
     =.  components-state
       (~(put by components-state) dit [cab state view props.cs children.cs])
     =/  flat-manx=(list manx)  ~(lvl-flatten-innertext manx-tools view)
@@ -574,7 +589,7 @@
     :: ~&  dit
     =/  watch-path-change=card:agent:gall
       [%pass /component/[dit]/new-url-path %agent [our.bowl dap.bowl] %watch /new-url-path]
-    =.  cards  :(weld new-component-cards og-cards cards)
+    =.  cards  :(weld new-component-cards og-cards sub-cards cards)
     =.  cards  (snoc cards watch-path-change)
     :: [cards this(current-manx (component-div-tag (with-id view:og)))]
     [cards this]
@@ -603,9 +618,9 @@
       %handle-http-request
         =^  cards  this
         =+  !<([=eyre-id =inbound-request:eyre] vase)
-        =/  path  (stab url.request.inbound-request) ::TODO stab should be able to parse trailing slash ('/path/' -> /path)
+        =/  path  (parse-request-line url.request.inbound-request)
         =/  navigation-card
-          [%pass /navigation-poke %agent [our.bowl dap.bowl] %poke [%ui !>([%new-path +.path])]]
+          [%pass /navigation-poke %agent [our.bowl dap.bowl] %poke [%ui !>([%new-path url.request.inbound-request])]] ::TODO remove eyre binding from beginning of path
         =/  c
           (~(got by components-state) %root)
         =/  document
@@ -621,8 +636,8 @@
         ?+  method.request.inbound-request  [not-found:gen:server this]
           %'GET'
           ~&  'GET'
-            ?+  path  [document this]
-                [@ ~]
+            ?+  site.path  [document this]
+                [@ ~]  ::TODO eyre binding here
               [document this]
             ==
         ==
@@ -662,26 +677,26 @@
             ?.  (~(has by components-state) dit.poke)  `this
             =.  components-state  (~(del by components-state) dit.poke)
             `this
-          %forward-subscription
-            :: ~&  "forward-subscription"
-            =/  c  (~(got by components-state) dit.poke)
-            =/  mold  (~(got by components) cab.c)
-            =^  cards  component  (on-load:og sta.c)
-            =^  cards  component  (on-agent:og wire.poke sign.poke)
-            :: get new state and view
-            =/  state  on-save:og
-            =/  view  (with-id view:og dit.poke &)
-            =/  view-fact
-              [%give %fact ~[/[dit.poke]/view] [%tape !>((en-xml:html view))]]
-            :: update wrapper state
-            =.  components-state
-              (~(put by components-state) dit.poke [cab.c state view pop.c sot.c])
-            =.  cards  (snoc cards view-fact)
-            [cards this]
+          :: %forward-subscription
+          ::   :: ~&  "forward-subscription"
+          ::   =/  c  (~(got by components-state) dit.poke)
+          ::   =/  mold  (~(got by components) cab.c)
+          ::   =^  cards  component  (on-load:og sta.c)
+          ::   =^  cards  component  (on-agent:og wire.poke sign.poke)
+          ::   :: get new state and view
+          ::   =/  state  on-save:og
+          ::   =/  view  (with-id view:og dit.poke &)
+          ::   =/  view-fact
+          ::     [%give %fact ~[/[dit.poke]/view] [%tape !>((en-xml:html view))]]
+          ::   :: update wrapper state
+          ::   =.  components-state
+          ::     (~(put by components-state) dit.poke [cab.c state view pop.c sot.c])
+          ::   =.  cards  (snoc cards view-fact)
+          ::   [cards this]
           %new-path
           ~&  >  'new-path'
           ~&  path.poke
-          ?:  =(path.poke url-path)  `this
+          ?:  =(path.poke url-path)  `this  ::TODO? eyre binding here
           =/  card
             [%give %fact ~[/new-url-path] [%path !>(path.poke)]]
           =.  url-path

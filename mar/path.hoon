@@ -1,9 +1,9 @@
-|_  pax=path
+|_  pax=cord
 ++  grad  %noun
 ++  grow
   |%
   ++  noun  pax
-  ++  json  s+(spat pax)
+  ++  json  s+pax
   --
 ++  grab
   |%

@@ -61,6 +61,9 @@
         ;Link.sail-component(to (s:ui4 /completed), clicked-style (s:ui4 "font-bold"))
           ;span: completed
         ==
+        ;a(href "http://google.com")
+          ;span: google
+        ==
       ==
       ;div.mt-4
         :: ;todoinput;

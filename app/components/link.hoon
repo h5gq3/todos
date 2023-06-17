@@ -5,7 +5,7 @@
 |%
 +$  state
 $:  clicked=_|
-    current-url-path=path
+    current-url-path=cord
 ==
 --
 
@@ -68,7 +68,7 @@ $:  clicked=_|
             :: ~&  "link to null"
             `this  ::TODO handle null props
             =/  go-to
-              ;;(path !<(* u.to))
+              (spat ;;(path !<(* u.to)))
             =/  card
               [%pass /navigation-poke %agent [our.bowl.bowl dap.bowl.bowl] %poke [%ui !>([%new-path go-to])]]
             :: ~&  >  'go to path'
