@@ -12,7 +12,7 @@
 +$  bowl
   $:  dit=term
       cab=term
-      url-path=cord
+      url-path=request-line
       =bowl:gall
   ==
 ::
@@ -23,7 +23,7 @@
   ==
 ::
 ++  make-bowl
-  |=  [=bowl:gall [dit=term cab=term url-path=cord]]
+  |=  [=bowl:gall [dit=term cab=term url-path=request-line]]
   ^-  ^bowl
   [dit cab url-path bowl]
 ::
@@ -32,6 +32,13 @@
   ^-  request-line
   (fall (rush url ;~(plug apat:de-purl:html yque:de-purl:html)) [[~ ~] ~])
 ::
+++  decap  ::  strip leading base from full site path
+  |=  [base=(list @t) site=(list @t)]
+  ^-  (unit (list @t))
+  ?~  base  `site
+  ?~  site  ~
+  ?.  =(i.base i.site)  ~
+  $(base t.base, site t.site)
 ++  all-domevents-json
   |=  events=(list [@t (list term)])
   ^-  json
@@ -214,6 +221,7 @@
   // when URL is "http://localhost/todos/active" and rootPath is "/todos" we want to return "/active"
   // when URL is "http://localhost/todos" and rootPath is "/todos" we want to return "/"
   // without the "http://localhost" part
+  //TODO remove this function, it's handled by urbit
   function getRelativePath(url) \{
     let path = url.slice(url.indexOf(rootPath) + rootPath.length);
     if (path === '') \{
@@ -229,7 +237,7 @@
       e.intercept(\{
         async handler() \{
           console.log('intercepting navigation');
-          navigationPoke(getRelativePath(e.destination.url));
+          navigationPoke(new URL(e.destination.url).pathname);
         }
       });
     }
@@ -473,7 +481,7 @@
   // subscribe to navigation events
   api.subscribe(\{
           app: "{(trip dap.bowl)}",
-          path: '/new-url-path',
+          path: '/new-url-path-fe',
           event: (e) => console.log('nav'),
           quit: () => console.log('quit'),
           err: () => console.log('Error')
@@ -504,8 +512,9 @@
       ?.  ag-init  `agent
       on-init:ag
     ::  if initial agent on-init, we get the eyre binding from cards
+    ::TODO what if card won't be there or will sent from somewhere else?
     =?  eyre-binding  ag-init
-      =-  (make-path -)
+      :: =-  (make-path -)
       ^-  binding:eyre
       =/  eyre-card
         %+  skim  cards
@@ -623,8 +632,9 @@
           [%pass /navigation-poke %agent [our.bowl dap.bowl] %poke [%ui !>([%new-path url.request.inbound-request])]] ::TODO remove eyre binding from beginning of path
         =/  c
           (~(got by components-state) %root)
+        =/  binding  (make-path eyre-binding)
         =/  document
-          (manx-response:gen:server (full-document (div-tagged viw.c) bowl eyre-binding))
+          (manx-response:gen:server (full-document (div-tagged viw.c) bowl binding))
         =;  [=simple-payload:http =_this]
         =/  payload-cards
           %+  give-simple-payload:app:server
@@ -696,12 +706,24 @@
           %new-path
           ~&  >  'new-path'
           ~&  path.poke
+          =/  parsed  (parse-request-line path.poke)
+          =/  decapped  (decap path.eyre-binding site.parsed)
+          =.  site.parsed  (need decapped)
+          ~&  "eyre-binding"
+          ~&  path.eyre-binding
+          ~&  "decapped"
+          ~&  decapped
+          ~&  "site.parsed"
+          ~&  site.parsed
           ?:  =(path.poke url-path)  `this  ::TODO? eyre binding here
-          =/  card
-            [%give %fact ~[/new-url-path] [%path !>(path.poke)]]
+          =/  cards
+            :~
+            [%give %fact ~[/new-url-path] [%new-path !>(parsed)]]
+            [%give %fact ~[/new-url-path-fe] [%path !>(path.poke)]]
+            ==
           =.  url-path
-            path.poke
-          [[card]~ this]
+            parsed
+          [cards this]
         ==
     ==
   ::

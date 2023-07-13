@@ -5,7 +5,7 @@
 |%
 +$  state
 $:  clicked=_|
-    current-url-path=cord
+    current-url-path=request-line:ui
 ==
 --
 
@@ -61,25 +61,28 @@ $:  clicked=_|
         ?+  -.poke  `this
             %domevent
           ?+  +<.poke  `this
-              %click
-            :: ~&  >  'link click on-poke'
-            =/  to  (~(get by props) %to)
-            ?~  to
-            :: ~&  "link to null"
-            `this  ::TODO handle null props
-            =/  go-to
-              (spat ;;(path !<(* u.to)))
-            =/  card
-              [%pass /navigation-poke %agent [our.bowl.bowl dap.bowl.bowl] %poke [%ui !>([%new-path go-to])]]
-            :: ~&  >  'go to path'
-            :: ~&  go-to
-            :: =.  clicked  &
-            =.  current-url-path  go-to
-            [[card]~ this]
+              %click  `this
+            :: :: ~&  >  'link click on-poke'
+            :: =/  to  (~(get by props) %to)
+            :: ?~  to
+            :: :: ~&  "link to null"
+            :: `this  ::TODO handle null props
+            :: =/  go-to
+            ::   (spat ;;(path !<(* u.to)))
+            :: =/  parsed  (parse-request-line:ui4 go-to)
+            :: =/  card
+            ::   [%pass /navigation-poke %agent [our.bowl.bowl dap.bowl.bowl] %poke [%ui !>([%new-path go-to])]]
+            :: :: ~&  >  'go to path'
+            :: :: ~&  go-to
+            :: :: =.  clicked  &
+            :: =.  current-url-path  parsed
+            :: [[card]~ this]
           ==
         ==
     ==
 ++  view
+~&  >  'link view'
+~&  site.current-url-path
 =/  to
   =+  (~(get by props) %to)
   ?~  -  /
@@ -89,7 +92,7 @@ $:  clicked=_|
 ?~  -  ""
 :: ~&  "to and current url-path are equal"
 :: ~&  =(current-url-path to)
-?.  =(current-url-path to)  ""
+?.  =(site.url-path.bowl to)  ""
 ;;(tape !<(* u.-))
 ::
 ;a.m-1(href :(weld "/" (trip dap.bowl.bowl) (trip (spat to))))

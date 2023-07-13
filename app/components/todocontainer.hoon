@@ -16,7 +16,6 @@ $:  todos=todos:sur
 ::
 +*  this  .
     default  ~(. (default-agent this %|) bowl.bowl)
-    :: url-path  (parse-request-line:ui4 url-path.bowl)
 ::
 ++  on-init
   ^-  (quip card:agent:gall _this)
@@ -112,6 +111,8 @@ $:  todos=todos:sur
   ^-  (quip card:agent:gall _this)
   `this
 ++  view
+  ~&  >  'todocontainer view'
+  ~&  site.url-path.bowl
   =/  default
     ;div
       ;todoinput.sail-component;
@@ -139,13 +140,13 @@ $:  todos=todos:sur
     ;*  (turn todos |=([=id:sur =todo:sur] ;todo.sail-component(todo (s:ui4 todo), key <`@`id>);))
     ==
   ::
-  =/  url-path  (parse-request-line:ui4 url-path.bowl)
-  ?+  site.url-path  default
+  :: =/  url-path  (parse-request-line:ui4 url-path.bowl)
+  ?+  site.url-path.bowl  default
       ~
     default
-      [@ %completed ~]
+      [%completed ~]
     completed
-      [@ %active ~]
+      [%active ~]
     active
   ==
 --
