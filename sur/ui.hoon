@@ -28,7 +28,7 @@
       [%keydown key-down-event]
       [%mouseenter mouse-enter-event]
       [%mouseleave mouse-leave-event]
-      :: [%submit form-submit-event]
+      [%submit form-submit-event]
   ==
 +$  click-event
   $:  target=cord
@@ -80,7 +80,7 @@
       keydown+key-down-event
       mouseenter+mouse-enter-event
       mouseleave+mouse-leave-event
-      :: submit+form-submit-event
+      submit+form-submit-event
   ==
   ++  click-event
     %-  ot

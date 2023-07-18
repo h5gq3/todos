@@ -20,7 +20,7 @@
   ^-  (quip card:agent:gall _this)
   :_  this
   :~
-  (fact:io [%domevents !>([dit.bowl ~[%keydown]])] [/event-listeners]~)
+  (fact:io [%domevents !>([dit.bowl ~[%submit]])] [/event-listeners]~)
   ==
 ++  on-load
   |=  =old-state=vase
@@ -61,49 +61,27 @@
   :: handle click
     ?+  mark  `this
     %ui
-    =/  poke  !<(ui-poke:ui vase)
-
+    =+  !<(poke=ui-poke:ui vase)
     ?+  -.poke  `this
       %domevent
         ?+  +<.poke  `this
-          %click
-            ~&  "clicking at root"
-            `this
-          :: %submit
-          ::   ~&  "submitting form"
-          ::   `this
-          %keydown
-            :: ~&  +>.poke
-            ~&  "pressed {<key:+>.poke>} key down"
-            ~&  "buffer is {buffer}"
-            =^  cards  this
-            =/  handle-key
-              ::  if key is a character, weld it to the buffer
-              ?:  =(1 (lent (trip key:+>.poke)))  `this(buffer (weld buffer (trip key:+>.poke)))
-              ::  if key is backspace, remove the last character from the buffer
-              ?:  =("Backspace" (trip key:+>.poke))  `this(buffer (snip buffer))
-              ::  if key is enter, set the seed to the buffer
-              ?:  =("Enter" (trip key:+>.poke))
-                ::  poke our agent with the seed
-                :_  this(buffer "")
-                :: poke our agent to add a todo
-            ~&  "buffer is {buffer} when sending fact"
-                :~
-                [%give %fact ~[:(weld /component /[dit.bowl] /start-date)] %start-date !>(buffer)]
-                ==
-              ::  otherwise, do nothing
-              `this
-            handle-key
-              ::
-            [cards this]
-
+          %submit
+            ~&  "submitting form"
+            =/  start-date  (~(got by entries.poke) 'start-date')
+            =/  end-date  (~(got by entries.poke) 'end-date')
+            :_  this
+            :~
+            [%give %fact ~[:(weld /component /[dit.bowl] /start-date)] %start-date !>(start-date)]
+            [%give %fact ~[:(weld /component /[dit.bowl] /end-date)] %end-date !>(end-date)]
+            ==
           ==
       ==
     ==
 ++  view
 ;div.flex.flex-row
   ;p: select date
-  ;form
+  :: we add ref of this component to form so we can handle submit event in on-poke
+  ;form(ref <dit.bowl>)
     ;label(for "start-date"): start date
     ;input#start-date(type "date", name "start-date");
     ;label(for "end-date"): end date

@@ -69,9 +69,9 @@ $:  todos=todos:sur
       %fact
     ?+    wire  `this
         [%start-date ~]
-      [~ this(start-date !<(tape q.cage.sign))]
+      [~ this(start-date (trip !<(cord q.cage.sign)))]
         [%end-date ~]
-      [~ this(end-date !<(tape q.cage.sign))]
+      [~ this(end-date (trip !<(cord q.cage.sign)))]
         [%todos ~]
         ~&  "initial todos"
         ~&  !<(todos:sur q.cage.sign)
@@ -123,14 +123,15 @@ $:  todos=todos:sur
       %+  skim  todos
       |=  [=id:sur =todo:sur]
       done.todo
-  =/  start-date
-    =/  url-args  (malt args.url-path.bowl)
-    =+  (~(get by url-args) 'start-date')
-    ?~  -  ""  (trip u.-)
-  =/  end-date
-    =/  url-args  (malt args.url-path.bowl)
-    =+  (~(get by url-args) 'end-date')
-    ?~  -  ""  (trip u.-)
+  ::  we can either parse form data from the url or get it from the subscription to the datepicker
+  :: =/  start-date
+  ::   =/  url-args  (malt args.url-path.bowl)
+  ::   =+  (~(get by url-args) 'start-date')
+  ::   ?~  -  ""  (trip u.-)
+  :: =/  end-date
+  ::   =/  url-args  (malt args.url-path.bowl)
+  ::   =+  (~(get by url-args) 'end-date')
+  ::   ?~  -  ""  (trip u.-)
     ;div
       ;datepicker#datepicker.sail-component(subscribe (s:ui4 [dit.bowl ~[/start-date /end-date]]));
       ;p:"selected start date:{start-date}"
