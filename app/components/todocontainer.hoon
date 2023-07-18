@@ -123,6 +123,14 @@ $:  todos=todos:sur
       %+  skim  todos
       |=  [=id:sur =todo:sur]
       done.todo
+  =/  start-date
+    =/  url-args  (malt args.url-path.bowl)
+    =+  (~(get by url-args) 'start-date')
+    ?~  -  ""  (trip u.-)
+  =/  end-date
+    =/  url-args  (malt args.url-path.bowl)
+    =+  (~(get by url-args) 'end-date')
+    ?~  -  ""  (trip u.-)
     ;div
       ;datepicker#datepicker.sail-component(subscribe (s:ui4 [dit.bowl ~[/start-date /end-date]]));
       ;p:"selected start date:{start-date}"

@@ -237,7 +237,8 @@
       e.intercept(\{
         async handler() \{
           console.log('intercepting navigation');
-          navigationPoke(new URL(e.destination.url).pathname);
+          const url = new URL(e.destination.url);
+          navigationPoke(url.pathname + url.search);
         }
       });
     }
